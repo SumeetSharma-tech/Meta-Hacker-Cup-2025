@@ -1,0 +1,78 @@
+from math import inf
+from collections import *
+import math, os, sys, heapq, bisect, random, threading
+from functools import lru_cache
+from itertools import *
+from typing import List
+def inp(): return sys.stdin.readline().rstrip("\r\n")
+def out(var): sys.stdout.write(str(var))  # for fast output, always take string
+def inpu(): return int(inp())
+def lis(): return list(map(int, inp().split()))
+def stringlis(): return list(map(str, inp().split()))
+def sep(): return map(int, inp().split())
+def strsep(): return map(str, inp().split())
+def fsep(): return map(float, inp().split())
+M = 1000000007
+rand = random.randint(10**8, 10**9)
+
+def check(arr: List[int], n: int, h: int) -> bool:
+    """Replicates the C++ check() from the image.
+    Partition the array into maximal segments where consecutive diffs <= h.
+    For each segment [i, j), require that min(arr[i:j]) <= h. If any segment
+    violates this, return False; otherwise True.
+    """
+    i = 0
+    while i < n:
+        j = i + 1
+        while j < n and abs(arr[j] - arr[j - 1]) <= h:
+            j += 1
+
+        mn = arr[i]
+        for k in range(i, j):
+            if arr[k] < mn:
+                mn = arr[k]
+        if mn > h:
+            return False
+        # In the C++ for-loop, they set i = j - 1 and the loop increments i++.
+        # Here we emulate that by jumping to the start of the next segment.
+        i = j
+    return True
+
+def main():
+    # Try to open local input/output files; fall back to stdio if not present
+    try:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        sys.stdin = open(os.path.join(script_dir, "input.txt"))
+        sys.stdout = open(os.path.join(script_dir, "output.txt"), "w")
+    except Exception:
+        pass
+
+    # Number of test cases
+    how_much_noob_i_am = inpu()
+
+    def read_exact_n(n: int) -> List[int]:
+        arr: List[int] = []
+        while len(arr) < n:
+            arr.extend(lis())
+        if len(arr) > n:
+            arr = arr[:n]
+        return arr
+
+    for tc in range(1, how_much_noob_i_am + 1):
+        # Read n and the array a of length n
+        n = inpu()
+        a = read_exact_n(n)
+
+        L = 0
+        R = 10**9  # use int upper bound
+        ans = -1
+        while L <= R:
+            mid = (L + R) // 2
+            if check(a, n, mid):
+                ans = mid
+                R = mid - 1
+            else:
+                L = mid + 1
+        print(f"Case #{tc}: {ans}")
+if __name__ == '__main__':
+    main()
